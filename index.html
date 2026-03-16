@@ -360,6 +360,8 @@
     <div>Events: <span class="val" id="stat-events">0</span></div>
     <div>Tools: <span class="val" id="stat-tools">0</span></div>
     <div>Uptime: <span class="val" id="stat-uptime">00:00</span></div>
+    <div style="border-left:1px solid #333;padding-left:12px;">🪙 Tokens: <span class="val" id="stat-tokens" style="color:#f59e0b;">—</span></div>
+    <div>Model: <span class="val" id="stat-model" style="color:#8b5cf6;">—</span></div>
   </div>
 </div>
 
@@ -881,6 +883,55 @@ function toggleMode() {
   // No events.json found — start demo
   startDemo();
 })();
+
+// ═══════════════════════════════════════════════
+//  TOKEN STATS — Poll /api/stats every 10 seconds
+// ═══════════════════════════════════════════════
+function formatTokens(n) {
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+  if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K';
+  return String(n);
+}
+
+async function fetchTokenStats() {
+  try {
+    const resp = await fetch('/api/stats?t=' + Date.now(), { cache: 'no-store' });
+    if (!resp.ok) return;
+    const stats = await resp.json();
+
+    // Sum all models
+    let totalInput = 0, totalOutput = 0, totalCache = 0;
+    let currentModel = '—';
+    const models = stats.modelUsage || {};
+
+    for (const [model, usage] of Object.entries(models)) {
+      totalInput += (usage.inputTokens || 0);
+      totalOutput += (usage.outputTokens || 0);
+      totalCache += (usage.cacheReadInputTokens || 0) + (usage.cacheCreationInputTokens || 0);
+    }
+
+    // Find most used model (by output tokens)
+    let maxOut = 0;
+    for (const [model, usage] of Object.entries(models)) {
+      if ((usage.outputTokens || 0) > maxOut) {
+        maxOut = usage.outputTokens;
+        currentModel = model
+          .replace('claude-', '')
+          .replace(/-\d{8,}$/, '');
+      }
+    }
+
+    const total = totalInput + totalOutput + totalCache;
+    document.getElementById('stat-tokens').textContent = formatTokens(total);
+    document.getElementById('stat-tokens').title =
+      `Input: ${formatTokens(totalInput)} | Output: ${formatTokens(totalOutput)} | Cache: ${formatTokens(totalCache)}`;
+    document.getElementById('stat-model').textContent = currentModel;
+  } catch (e) {}
+}
+
+// Fetch immediately and then every 10 seconds
+fetchTokenStats();
+setInterval(fetchTokenStats, 10000);
 
 </script>
 </body>

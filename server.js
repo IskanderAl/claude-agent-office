@@ -6,6 +6,7 @@ const path = require('path');
 
 const PORT = 3001;
 const ROOT = __dirname;
+const STATS_FILE = path.join(process.env.USERPROFILE || process.env.HOME || '', '.claude', 'stats-cache.json');
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -19,6 +20,25 @@ const MIME = {
 http.createServer((req, res) => {
   let url = req.url.split('?')[0];  // strip query params
   if (url === '/') url = '/index.html';
+
+  // Special route: /api/stats — serve Claude Code stats-cache.json
+  if (url === '/api/stats') {
+    fs.readFile(STATS_FILE, (err, data) => {
+      const headers = {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+        'Access-Control-Allow-Origin': '*',
+      };
+      if (err) {
+        res.writeHead(404, headers);
+        res.end(JSON.stringify({ error: 'stats-cache.json not found' }));
+        return;
+      }
+      res.writeHead(200, headers);
+      res.end(data);
+    });
+    return;
+  }
 
   const filePath = path.join(ROOT, url);
 

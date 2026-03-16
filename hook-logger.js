@@ -16,6 +16,30 @@ process.stdin.on('end', () => {
   try {
     const hookData = JSON.parse(input);
 
+    // Debug: dump all hook keys to see if tokens/cost data exists
+    const debugFile = path.join(__dirname, 'hook-debug.json');
+    try {
+      const debugData = {
+        timestamp: Date.now(),
+        all_keys: Object.keys(hookData),
+        hook_type: hookData.hook_type,
+        tool_name: hookData.tool_name,
+        // Log everything except tool_input content (too large)
+        has_tool_output: !!hookData.tool_output,
+        has_usage: !!hookData.usage,
+        has_tokens: !!hookData.tokens,
+        has_cost: !!hookData.cost,
+        has_metadata: !!hookData.metadata,
+        has_stats: !!hookData.stats,
+        raw_extra: Object.fromEntries(
+          Object.entries(hookData).filter(([k]) =>
+            !['tool_input', 'tool_output'].includes(k)
+          )
+        ),
+      };
+      fs.writeFileSync(debugFile, JSON.stringify(debugData, null, 2));
+    } catch(e) {}
+
     // Build event object
     const event = {
       timestamp: Date.now(),
