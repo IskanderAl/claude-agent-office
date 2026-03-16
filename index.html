@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Agent Office — LIVE</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a0f;
+    font-family: 'JetBrains Mono', monospace;
+    color: #e0e0e0;
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background: linear-gradient(90deg, #111118, #1a1a2e);
+    border-bottom: 1px solid #f59e0b33;
+    z-index: 100;
+    position: relative;
+  }
+  .header h1 {
+    font-size: 16px;
+    color: #f59e0b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .mode-badge {
+    font-size: 9px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .mode-badge.live { background: #10b98133; color: #10b981; border: 1px solid #10b981; }
+  .mode-badge.demo { background: #f59e0b22; color: #f59e0b; border: 1px solid #f59e0b55; }
+  .stats {
+    display: flex;
+    gap: 20px;
+    font-size: 11px;
+    color: #888;
+  }
+  .stats .val { color: #f59e0b; font-weight: 700; }
+
+  .office-wrapper {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 50px);
+    overflow: hidden;
+  }
+
+  .office {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background:
+      radial-gradient(circle at 20% 30%, #1a1a2e22, transparent 50%),
+      radial-gradient(circle at 80% 70%, #f59e0b05, transparent 50%),
+      #0d0d14;
+  }
+  .office::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(#ffffff06 1px, transparent 1px),
+      linear-gradient(90deg, #ffffff06 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+
+  .zone {
+    position: absolute;
+    border: 1px solid #ffffff10;
+    border-radius: 12px;
+    background: #ffffff04;
+    padding: 8px 14px;
+  }
+  .zone-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #555;
+  }
+  .desk {
+    position: absolute;
+    width: 60px;
+    height: 40px;
+    background: linear-gradient(135deg, #1e1e30, #252540);
+    border: 1px solid #333;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  /* ─── Bot ─── */
+  .bot {
+    position: absolute;
+    transition: left 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                top 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 10;
+    cursor: pointer;
+    filter: drop-shadow(0 0 12px var(--glow));
+  }
+  .bot:hover { transform: scale(1.15); }
+  .bot:hover .bot-details { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+
+  .bot-body {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    border: 2px solid var(--border);
+    position: relative;
+    animation: bob 2s ease-in-out infinite;
+  }
+  .bot-body.walking { animation: walk 0.4s ease-in-out infinite; }
+
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+  @keyframes walk {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-6px) rotate(3deg); }
+  }
+
+  .status-ring {
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: var(--color);
+    animation: spin 1.5s linear infinite;
+    opacity: 0;
+  }
+  .bot.working .status-ring { opacity: 1; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .bot-name {
+    position: absolute;
+    bottom: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--color);
+    white-space: nowrap;
+    text-shadow: 0 0 8px #000;
+    background: #0a0a0fcc;
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+
+  /* ─── Bubble ─── */
+  .bubble {
+    position: absolute;
+    bottom: 54px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1a2eee;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 6px 12px;
+    font-size: 10px;
+    color: #ccc;
+    white-space: nowrap;
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    box-shadow: 0 4px 20px #00000066;
+  }
+  .bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid var(--border);
+  }
+  .bot.working .bubble,
+  .bot:hover .bubble { opacity: 1; }
+
+  /* ─── Detail Card ─── */
+  .bot-details {
+    position: absolute;
+    top: 58px;
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    background: #12121dee;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 10px;
+    width: 220px;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+    box-shadow: 0 8px 30px #000000aa;
+    z-index: 20;
+    backdrop-filter: blur(10px);
+  }
+  .bot-details .row {
+    display: flex;
+    justify-content: space-between;
+    margin: 3px 0;
+    color: #888;
+  }
+  .bot-details .row .v { color: #f59e0b; font-weight: 700; }
+  .bot-details .progress-bar {
+    height: 3px;
+    background: #222;
+    border-radius: 2px;
+    margin-top: 6px;
+    overflow: hidden;
+  }
+  .bot-details .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.5s;
+  }
+
+  /* ─── Log Panel ─── */
+  .log-panel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: linear-gradient(0deg, #0a0a0fee, #0a0a0f00);
+    padding: 10px 24px;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 2px;
+    overflow: hidden;
+    z-index: 50;
+    pointer-events: none;
+  }
+  .log-entry {
+    font-size: 10px;
+    color: #555;
+    white-space: nowrap;
+    animation: fadeLog 6s forwards;
+  }
+  .log-entry .time { color: #333; }
+  .log-entry .agent { color: #f59e0b; }
+  .log-entry .action { color: #666; }
+  .log-entry.real .agent { color: #10b981; }
+  .log-entry.real .action { color: #10b98199; }
+
+  @keyframes fadeLog {
+    0% { opacity: 1; }
+    70% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  /* ─── Controls ─── */
+  .controls {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    display: flex;
+    gap: 8px;
+    z-index: 50;
+  }
+  .btn {
+    background: #1a1a2e;
+    border: 1px solid #333;
+    color: #ccc;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn:hover { border-color: #f59e0b; color: #f59e0b; }
+  .btn.active { background: #f59e0b22; border-color: #f59e0b; color: #f59e0b; }
+
+  .particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #f59e0b;
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+    animation: particle 1s ease-out forwards;
+  }
+  @keyframes particle {
+    0% { opacity: 0.8; transform: translate(0, 0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0); }
+  }
+
+  .connections {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+  }
+  .connections line {
+    stroke: #f59e0b;
+    stroke-width: 0.5;
+    stroke-dasharray: 4 4;
+    animation: dashMove 2s linear infinite;
+    opacity: 0.2;
+  }
+  @keyframes dashMove { to { stroke-dashoffset: -16; } }
+
+  /* Live pulse indicator */
+  .live-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  .live-dot.connected { background: #10b981; }
+  .live-dot.disconnected { background: #ef4444; }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 currentColor; }
+    50% { opacity: 0.6; box-shadow: 0 0 8px 2px currentColor; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>
+    🏢 Claude Agent Office
+    <span class="mode-badge demo" id="modeBadge">
+      <span class="live-dot disconnected" id="liveDot"></span>DEMO
+    </span>
+  </h1>
+  <div class="stats">
+    <div>Workers: <span class="val" id="stat-agents">0</span></div>
+    <div>Events: <span class="val" id="stat-events">0</span></div>
+    <div>Tools: <span class="val" id="stat-tools">0</span></div>
+    <div>Uptime: <span class="val" id="stat-uptime">00:00</span></div>
+  </div>
+</div>
+
+<div class="office-wrapper">
+  <div class="office" id="office">
+    <!-- Row 1 -->
+    <div class="zone" style="left:20px;top:20px;width:180px;height:170px;">
+      <div class="zone-label">📖 Read / Search</div>
+      <div class="desk" style="left:20px;top:45px;">📖</div>
+      <div class="desk" style="left:95px;top:45px;">🔍</div>
+      <div class="desk" style="left:20px;top:105px;">📂</div>
+      <div class="desk" style="left:95px;top:105px;">🗃️</div>
+    </div>
+
+    <div class="zone" style="left:220px;top:20px;width:190px;height:170px;">
+      <div class="zone-label">✏️ Write / Edit</div>
+      <div class="desk" style="left:20px;top:45px;">✏️</div>
+      <div class="desk" style="left:100px;top:45px;">📝</div>
+      <div class="desk" style="left:60px;top:105px;">💾</div>
+    </div>
+
+    <div class="zone" style="left:430px;top:20px;width:190px;height:170px;">
+      <div class="zone-label">⚡ Bash / Execute</div>
+      <div class="desk" style="left:20px;top:50px;">⚡</div>
+      <div class="desk" style="left:100px;top:50px;">🖥️</div>
+      <div class="desk" style="left:60px;top:110px;">⚙️</div>
+    </div>
+
+    <!-- Row 2 -->
+    <div class="zone" style="left:20px;top:220px;width:150px;height:130px;">
+      <div class="zone-label">💤 Idle / Thinking</div>
+      <div class="desk" style="left:40px;top:50px;">🧠</div>
+    </div>
+
+    <div class="zone" style="left:190px;top:220px;width:260px;height:130px;">
+      <div class="zone-label">🌐 Web / Research</div>
+      <div class="desk" style="left:30px;top:50px;">🌐</div>
+      <div class="desk" style="left:110px;top:50px;">🔎</div>
+      <div class="desk" style="left:180px;top:50px;">📊</div>
+    </div>
+
+    <div class="zone" style="left:470px;top:220px;width:150px;height:130px;">
+      <div class="zone-label">🤖 Sub-Agents</div>
+      <div class="desk" style="left:40px;top:50px;">🤖</div>
+    </div>
+
+    <svg class="connections" id="connections"></svg>
+    <div class="log-panel" id="logPanel"></div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" onclick="addWorker()">+ Add Worker</button>
+    <button class="btn" id="modeBtn" onclick="toggleMode()">🔄 Switch to Demo</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  ZONE MAPPING — tool name → office zone coords
+// ═══════════════════════════════════════════════
+const TOOL_ZONES = {
+  'Read':      [{x: 60, y: 85}, {x: 135, y: 85}],
+  'Grep':      [{x: 135, y: 85}, {x: 60, y: 145}],
+  'Glob':      [{x: 60, y: 145}, {x: 135, y: 145}],
+  'Write':     [{x: 260, y: 85}, {x: 340, y: 85}],
+  'Edit':      [{x: 340, y: 85}, {x: 300, y: 140}],
+  'Bash':      [{x: 470, y: 90}, {x: 550, y: 90}],
+  'Agent':     [{x: 530, y: 290}],
+  'WebSearch': [{x: 240, y: 290}, {x: 320, y: 290}],
+  'WebFetch':  [{x: 320, y: 290}, {x: 390, y: 290}],
+  '_idle':     [{x: 80, y: 300}],
+  '_think':    [{x: 80, y: 300}],
+};
+
+const TOOL_STYLES = {
+  'Read':      { emoji: '📖', color: '#3b82f6', border: '#60a5fa', glow: '#3b82f644' },
+  'Grep':      { emoji: '🔍', color: '#06b6d4', border: '#22d3ee', glow: '#06b6d444' },
+  'Glob':      { emoji: '📂', color: '#0ea5e9', border: '#38bdf8', glow: '#0ea5e944' },
+  'Write':     { emoji: '✏️', color: '#10b981', border: '#34d399', glow: '#10b98144' },
+  'Edit':      { emoji: '📝', color: '#14b8a6', border: '#2dd4bf', glow: '#14b8a644' },
+  'Bash':      { emoji: '⚡', color: '#f59e0b', border: '#fbbf24', glow: '#f59e0b44' },
+  'Agent':     { emoji: '🤖', color: '#8b5cf6', border: '#a78bfa', glow: '#8b5cf644' },
+  'WebSearch': { emoji: '🌐', color: '#ec4899', border: '#f472b6', glow: '#ec489944' },
+  'WebFetch':  { emoji: '🔗', color: '#e879f9', border: '#f0abfc', glow: '#e879f944' },
+  '_default':  { emoji: '🔧', color: '#6b7280', border: '#9ca3af', glow: '#6b728044' },
+};
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+let workers = {};       // session_id -> worker object
+let mode = 'live';      // 'live' or 'demo'
+let lastEventIndex = 0;
+let totalEvents = 0;
+let totalTools = 0;
+let startTime = Date.now();
+let demoIntervals = [];
+
+const office = document.getElementById('office');
+
+// ═══════════════════════════════════════════════
+//  WORKER (visual bot in the office)
+// ═══════════════════════════════════════════════
+function getOrCreateWorker(sessionId, toolName) {
+  if (workers[sessionId]) return workers[sessionId];
+
+  const style = TOOL_STYLES['_default'];
+  const idle = TOOL_ZONES['_idle'];
+  const pos = idle[0];
+
+  const el = document.createElement('div');
+  el.className = 'bot';
+  el.style.setProperty('--color', style.color);
+  el.style.setProperty('--border', style.border);
+  el.style.setProperty('--glow', style.glow);
+  el.style.left = pos.x + 'px';
+  el.style.top = pos.y + 'px';
+
+  const shortId = sessionId ? sessionId.substring(0, 6) : 'main';
+
+  el.innerHTML = `
+    <div class="bubble"><span class="msg">Waiting...</span></div>
+    <div class="bot-body">🤖<div class="status-ring"></div></div>
+    <div class="bot-name">${shortId}</div>
+    <div class="bot-details">
+      <div style="font-weight:700;color:${style.color};margin-bottom:4px;">🤖 Worker ${shortId}</div>
+      <div class="row"><span>Session</span><span class="v session-text">${shortId}</span></div>
+      <div class="row"><span>Status</span><span class="v status-text">idle</span></div>
+      <div class="row"><span>Last tool</span><span class="v tool-text">-</span></div>
+      <div class="row"><span>Events</span><span class="v events-text">0</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:0%;background:${style.color}"></div></div>
+    </div>
+  `;
+
+  office.appendChild(el);
+
+  const worker = {
+    id: sessionId,
+    shortId,
+    el,
+    x: pos.x,
+    y: pos.y,
+    events: 0,
+    lastTool: null,
+    idleTimer: null,
+  };
+
+  workers[sessionId] = worker;
+  updateStats();
+  addLog(shortId, 'appeared in office', true);
+  spawnParticles(pos.x + 22, pos.y + 22, style.color);
+
+  return worker;
+}
+
+function moveWorkerToTool(worker, toolName, detail) {
+  const style = TOOL_STYLES[toolName] || TOOL_STYLES['_default'];
+  const zones = TOOL_ZONES[toolName] || TOOL_ZONES['_idle'];
+  const dest = zones[Math.floor(Math.random() * zones.length)];
+
+  // Update visual style
+  worker.el.style.setProperty('--color', style.color);
+  worker.el.style.setProperty('--border', style.border);
+  worker.el.style.setProperty('--glow', style.glow);
+
+  // Move
+  worker.x = dest.x + Math.random() * 20 - 10;
+  worker.y = dest.y + Math.random() * 20 - 10;
+  worker.el.style.left = worker.x + 'px';
+  worker.el.style.top = worker.y + 'px';
+
+  // Walking animation
+  const body = worker.el.querySelector('.bot-body');
+  body.textContent = '';
+  body.innerHTML = style.emoji + '<div class="status-ring"></div>';
+  body.classList.add('walking');
+  setTimeout(() => body.classList.remove('walking'), 1500);
+
+  // Working state
+  worker.el.classList.add('working');
+  worker.events++;
+  worker.lastTool = toolName;
+  totalTools++;
+
+  // Update bubble
+  const msg = worker.el.querySelector('.msg');
+  msg.textContent = detail || `Using ${toolName}...`;
+
+  // Update detail card
+  worker.el.querySelector('.status-text').textContent = 'working';
+  worker.el.querySelector('.status-text').style.color = '#10b981';
+  worker.el.querySelector('.tool-text').textContent = toolName;
+  worker.el.querySelector('.events-text').textContent = worker.events;
+  worker.el.querySelector('.progress-fill').style.width = '100%';
+  worker.el.querySelector('.progress-fill').style.background = style.color;
+
+  // Auto-idle after some time
+  clearTimeout(worker.idleTimer);
+  worker.idleTimer = setTimeout(() => {
+    worker.el.classList.remove('working');
+    worker.el.querySelector('.msg').textContent = '💤 Waiting...';
+    worker.el.querySelector('.status-text').textContent = 'idle';
+    worker.el.querySelector('.status-text').style.color = '#888';
+    worker.el.querySelector('.progress-fill').style.width = '0%';
+
+    // Move back to idle zone
+    const idle = TOOL_ZONES['_idle'][0];
+    worker.x = idle.x + Math.random() * 30;
+    worker.y = idle.y + Math.random() * 20;
+    worker.el.style.left = worker.x + 'px';
+    worker.el.style.top = worker.y + 'px';
+  }, 5000);
+
+  spawnParticles(worker.x + 22, worker.y + 22, style.color);
+}
+
+// ═══════════════════════════════════════════════
+//  LIVE MODE — Poll events.json
+// ═══════════════════════════════════════════════
+let pollInterval = null;
+
+function startLiveMode() {
+  mode = 'live';
+  stopDemo();
+
+  document.getElementById('modeBadge').className = 'mode-badge live';
+  document.getElementById('modeBadge').innerHTML = '<span class="live-dot connected" id="liveDot"></span>LIVE';
+  document.getElementById('modeBtn').textContent = '🔄 Switch to Demo';
+
+  addLog('System', '🟢 Live mode — polling events.json...', false);
+
+  pollInterval = setInterval(async () => {
+    try {
+      const resp = await fetch('events.json?t=' + Date.now());
+      if (!resp.ok) {
+        setDisconnected();
+        return;
+      }
+      const events = await resp.json();
+      setConnected();
+
+      // Process new events
+      for (let i = lastEventIndex; i < events.length; i++) {
+        const evt = events[i];
+        totalEvents++;
+
+        const sessionId = evt.session || 'main';
+        const worker = getOrCreateWorker(sessionId, evt.tool);
+        moveWorkerToTool(worker, evt.tool, evt.detail);
+        addLog(worker.shortId, evt.detail || `${evt.tool} tool`, true);
+
+        // If it's a sub-agent launch, create a new worker for it
+        if (evt.tool === 'Agent' && evt.agent_name) {
+          addLog('System', `🤖 Sub-agent launched: ${evt.agent_name}`, true);
+        }
+      }
+      lastEventIndex = events.length;
+      updateStats();
+    } catch (e) {
+      setDisconnected();
+    }
+  }, 1000);
+}
+
+function setConnected() {
+  const dot = document.getElementById('liveDot');
+  if (dot) { dot.className = 'live-dot connected'; }
+  const badge = document.getElementById('modeBadge');
+  badge.className = 'mode-badge live';
+  badge.innerHTML = '<span class="live-dot connected" id="liveDot"></span>LIVE';
+}
+
+function setDisconnected() {
+  const dot = document.getElementById('liveDot');
+  if (dot) { dot.className = 'live-dot disconnected'; }
+}
+
+function stopLiveMode() {
+  if (pollInterval) clearInterval(pollInterval);
+  pollInterval = null;
+}
+
+// ═══════════════════════════════════════════════
+//  DEMO MODE — Simulated activity
+// ═══════════════════════════════════════════════
+const DEMO_TOOLS = ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob', 'Agent', 'WebSearch'];
+const DEMO_DETAILS = {
+  'Read':      ['Reading index.ts...', 'Reading config.json...', 'Reading package.json...', 'Reading README.md...'],
+  'Write':     ['Writing component.tsx...', 'Creating test file...', 'Writing utils.ts...'],
+  'Edit':      ['Fixing import path...', 'Refactoring function...', 'Updating type def...'],
+  'Bash':      ['$ npm run build', '$ git status', '$ npm test', '$ tsc --noEmit'],
+  'Grep':      ['Searching "useState"...', 'Finding "export"...', 'Pattern: "TODO"...'],
+  'Glob':      ['Finding **/*.tsx...', 'Matching *.test.ts...', 'Scanning src/...'],
+  'Agent':     ['🤖 Explore: scan codebase', '🤖 Plan: design architecture', '🤖 Review: check code'],
+  'WebSearch': ['Searching: "React patterns"', 'Looking up: "TypeScript generics"'],
+};
+
+let demoWorkerCount = 0;
+
+function startDemo() {
+  mode = 'demo';
+  stopLiveMode();
+
+  document.getElementById('modeBadge').className = 'mode-badge demo';
+  document.getElementById('modeBadge').innerHTML = '<span class="live-dot disconnected" id="liveDot"></span>DEMO';
+  document.getElementById('modeBtn').textContent = '🔄 Switch to Live';
+
+  addLog('System', '🟡 Demo mode — simulating activity', false);
+
+  // Create some demo workers
+  for (let i = 0; i < 3; i++) {
+    const id = 'demo-' + (demoWorkerCount++);
+    getOrCreateWorker(id);
+  }
+
+  // Simulate random activity
+  function randomDemoAction() {
+    const ids = Object.keys(workers);
+    if (ids.length === 0) return;
+
+    const workerId = ids[Math.floor(Math.random() * ids.length)];
+    const worker = workers[workerId];
+    const tool = DEMO_TOOLS[Math.floor(Math.random() * DEMO_TOOLS.length)];
+    const details = DEMO_DETAILS[tool];
+    const detail = details[Math.floor(Math.random() * details.length)];
+
+    totalEvents++;
+    moveWorkerToTool(worker, tool, detail);
+    addLog(worker.shortId, detail, false);
+    updateStats();
+  }
+
+  // Stagger demo actions
+  demoIntervals.push(setInterval(randomDemoAction, 2000 + Math.random() * 2000));
+  demoIntervals.push(setInterval(randomDemoAction, 3000 + Math.random() * 3000));
+
+  // Occasionally spawn new demo agent
+  demoIntervals.push(setInterval(() => {
+    if (Object.keys(workers).length < 8 && Math.random() < 0.3) {
+      const id = 'demo-' + (demoWorkerCount++);
+      getOrCreateWorker(id);
+    }
+  }, 8000));
+}
+
+function stopDemo() {
+  demoIntervals.forEach(id => clearInterval(id));
+  demoIntervals = [];
+}
+
+// ═══════════════════════════════════════════════
+//  UI Helpers
+// ═══════════════════════════════════════════════
+function addLog(agent, action, isReal) {
+  const panel = document.getElementById('logPanel');
+  const entry = document.createElement('div');
+  entry.className = 'log-entry' + (isReal ? ' real' : '');
+  const now = new Date();
+  const time = now.toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+  entry.innerHTML = `<span class="time">[${time}]</span> <span class="agent">${agent}</span> <span class="action">${action}</span>`;
+  panel.prepend(entry);
+  if (panel.children.length > 30) panel.lastChild.remove();
+  setTimeout(() => entry.remove(), 8000);
+}
+
+function spawnParticles(cx, cy, color) {
+  for (let i = 0; i < 6; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = cx + 'px';
+    p.style.top = cy + 'px';
+    p.style.background = color;
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 15 + Math.random() * 25;
+    p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+    p.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+    office.appendChild(p);
+    setTimeout(() => p.remove(), 1000);
+  }
+}
+
+function updateStats() {
+  document.getElementById('stat-agents').textContent = Object.keys(workers).length;
+  document.getElementById('stat-events').textContent = totalEvents;
+  document.getElementById('stat-tools').textContent = totalTools;
+}
+
+function updateUptime() {
+  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+  const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
+  const s = String(elapsed % 60).padStart(2, '0');
+  document.getElementById('stat-uptime').textContent = `${m}:${s}`;
+  requestAnimationFrame(updateUptime);
+}
+updateUptime();
+
+// Connection lines
+function updateConnections() {
+  const svg = document.getElementById('connections');
+  svg.innerHTML = '';
+  const ids = Object.keys(workers);
+  // Draw lines between working workers
+  const working = ids.filter(id => workers[id].el.classList.contains('working'));
+  for (let i = 0; i < working.length - 1; i++) {
+    const a = workers[working[i]], b = workers[working[i + 1]];
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', a.x + 22);
+    line.setAttribute('y1', a.y + 22);
+    line.setAttribute('x2', b.x + 22);
+    line.setAttribute('y2', b.y + 22);
+    const style = TOOL_STYLES[a.lastTool] || TOOL_STYLES['_default'];
+    line.style.stroke = style.color;
+    svg.appendChild(line);
+  }
+  requestAnimationFrame(updateConnections);
+}
+updateConnections();
+
+// ─── Controls ───
+function addWorker() {
+  const id = 'manual-' + Date.now().toString(36);
+  getOrCreateWorker(id);
+}
+
+function toggleMode() {
+  if (mode === 'live') {
+    startDemo();
+  } else {
+    // Clear demo workers
+    Object.values(workers).forEach(w => w.el.remove());
+    workers = {};
+    lastEventIndex = 0;
+    totalEvents = 0;
+    totalTools = 0;
+    startLiveMode();
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  INIT — Try live first, fall back to demo
+// ═══════════════════════════════════════════════
+(async function init() {
+  try {
+    const resp = await fetch('events.json?t=' + Date.now());
+    if (resp.ok) {
+      startLiveMode();
+      return;
+    }
+  } catch (e) {}
+  // No events.json found — start demo
+  startDemo();
+})();
+
+</script>
+</body>
+</html>
