@@ -69,20 +69,31 @@ function extractDetail(hookData) {
     case 'Edit':
       return `Editing ${shortenPath(input.file_path)}`;
     case 'Bash':
-      return `$ ${(input.command || '').substring(0, 60)}`;
+      return `$ ${redact((input.command || '').substring(0, 60))}`;
     case 'Grep':
-      return `Searching: "${(input.pattern || '').substring(0, 40)}"`;
+      return `Searching: "${redact((input.pattern || '').substring(0, 40))}"`;
     case 'Glob':
       return `Finding: ${(input.pattern || '').substring(0, 40)}`;
     case 'Agent':
-      return `Agent: ${input.description || input.subagent_type || 'sub-agent'}`;
+      return `Agent: ${redact((input.description || input.subagent_type || 'sub-agent').substring(0, 60))}`;
     case 'WebSearch':
-      return `Searching web: "${(input.query || '').substring(0, 40)}"`;
+      return `Searching web: "${redact((input.query || '').substring(0, 40))}"`;
     case 'WebFetch':
-      return `Fetching: ${(input.url || '').substring(0, 50)}`;
+      return `Fetching: ${redact((input.url || '').substring(0, 50))}`;
     default:
-      return `${tool} tool`;
+      return `${(tool || 'unknown').substring(0, 40)} tool`;
   }
+}
+
+// Redact sensitive patterns from logged strings
+function redact(str) {
+  if (!str) return '';
+  return str
+    .replace(/(?:Bearer|token|key|password|secret|auth)[=:\s]+\S{4,}/gi, '[REDACTED]')
+    .replace(/sk-[a-zA-Z0-9]{8,}/g, '[REDACTED]')
+    .replace(/ghp_[a-zA-Z0-9]{8,}/g, '[REDACTED]')
+    .replace(/glpat-[a-zA-Z0-9]{8,}/g, '[REDACTED]')
+    .replace(/(?:api[_-]?key|apikey)[=:\s]+\S{4,}/gi, '[REDACTED]');
 }
 
 function shortenPath(p) {
