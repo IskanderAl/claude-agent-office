@@ -452,13 +452,47 @@ const TOOL_STYLES = {
 // ═══════════════════════════════════════════════
 let workers = {};       // session_id -> worker object
 let mode = 'live';      // 'live' or 'demo'
-let lastEventIndex = 0;
+let lastEventTimestamp = 0;
 let totalEvents = 0;
 let totalTools = 0;
 let startTime = Date.now();
 let demoIntervals = [];
 
 const office = document.getElementById('office');
+
+// ═══════════════════════════════════════════════
+//  KAZAKH BOT NAMES 🇰🇿
+// ═══════════════════════════════════════════════
+// Map tool categories to dedicated Kazakh bots
+const TOOL_TO_BOT = {
+  'Read':      { name: 'Ербол',    role: 'читатель',    emoji: '📖' },
+  'Grep':      { name: 'Нұрлан',   role: 'искатель',    emoji: '🔍' },
+  'Glob':      { name: 'Нұрлан',   role: 'искатель',    emoji: '🔍' },
+  'Write':     { name: 'Бауыржан', role: 'строитель',   emoji: '🏗️' },
+  'Edit':      { name: 'Айдос',    role: 'кодер',       emoji: '⚡' },
+  'Bash':      { name: 'Дамир',    role: 'инженер',     emoji: '⚙️' },
+  'Agent':     { name: 'Искандер', role: 'мыслитель',   emoji: '🧠' },
+  'WebSearch': { name: 'Арман',    role: 'разведчик',   emoji: '🌐' },
+  'WebFetch':  { name: 'Арман',    role: 'разведчик',   emoji: '🌐' },
+  '_default':  { name: 'Тимур',    role: 'архитектор',  emoji: '📐' },
+};
+let botNameIndex = 0;
+const BOT_NAMES_EXTRA = [
+  { name: 'Қайрат',   role: 'тестировщик', emoji: '🧪' },
+  { name: 'Асет',     role: 'аналитик',    emoji: '📊' },
+  { name: 'Жандос',   role: 'дебагер',     emoji: '🐛' },
+  { name: 'Серік',    role: 'оптимизатор', emoji: '🚀' },
+];
+
+function getBotNameForTool(tool) {
+  return TOOL_TO_BOT[tool] || TOOL_TO_BOT['_default'];
+}
+
+function getNextBotName() {
+  const bot = BOT_NAMES_EXTRA[botNameIndex % BOT_NAMES_EXTRA.length];
+  botNameIndex++;
+  return bot;
+}
 
 // ═══════════════════════════════════════════════
 //  WORKER (visual bot in the office)
@@ -496,10 +530,15 @@ function getOrCreateWorker(sessionId, toolName) {
       <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
     </div>
   `;
+  // Assign Kazakh bot name based on tool
+  const botInfo = getBotNameForTool(toolName) || getNextBotName();
+  const displayName = `${botInfo.name}-бот`;
+  const fullTitle = `${botInfo.emoji} ${botInfo.name}-бот ${botInfo.role}`;
+
   // Set text safely via textContent
-  el.querySelector('.bot-name').textContent = shortId;
+  el.querySelector('.bot-name').textContent = displayName;
   el.querySelector('.bot-name').style.color = style.color;
-  el.querySelector('.bot-title').textContent = '🤖 Worker ' + shortId;
+  el.querySelector('.bot-title').textContent = fullTitle;
   el.querySelector('.bot-title').style.color = style.color;
   el.querySelector('.session-text').textContent = shortId;
   el.querySelector('.progress-fill').style.background = style.color;
@@ -508,7 +547,7 @@ function getOrCreateWorker(sessionId, toolName) {
 
   const worker = {
     id: sessionId,
-    shortId,
+    shortId: displayName,
     el,
     x: pos.x,
     y: pos.y,
@@ -603,7 +642,10 @@ function startLiveMode() {
 
   pollInterval = setInterval(async () => {
     try {
-      const resp = await fetch('events.json?t=' + Date.now());
+      const resp = await fetch('events.json?t=' + Date.now(), {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+      });
       if (!resp.ok) {
         setDisconnected();
         return;
@@ -611,22 +653,27 @@ function startLiveMode() {
       const events = await resp.json();
       setConnected();
 
-      // Process new events
-      for (let i = lastEventIndex; i < events.length; i++) {
-        const evt = events[i];
+      // Process new events (by timestamp to handle rotating buffer)
+      const newEvents = events.filter(evt => evt.timestamp > lastEventTimestamp);
+      for (const evt of newEvents) {
         totalEvents++;
 
-        const sessionId = evt.session || 'main';
-        const worker = getOrCreateWorker(sessionId, evt.tool);
+        // Each tool type gets its own dedicated bot worker
+        const toolKey = evt.tool || 'unknown';
+        const botInfo = getBotNameForTool(toolKey);
+        const workerId = 'bot-' + botInfo.name;
+        const worker = getOrCreateWorker(workerId, evt.tool);
         moveWorkerToTool(worker, evt.tool, evt.detail);
         addLog(worker.shortId, evt.detail || `${evt.tool} tool`, true);
 
-        // If it's a sub-agent launch, create a new worker for it
+        // If it's a sub-agent launch, log it
         if (evt.tool === 'Agent' && evt.agent_name) {
-          addLog('System', `🤖 Sub-agent launched: ${evt.agent_name}`, true);
+          addLog('System', `🤖 ${botInfo.name} запустил: ${evt.agent_name}`, true);
         }
       }
-      lastEventIndex = events.length;
+      if (events.length > 0) {
+        lastEventTimestamp = events[events.length - 1].timestamp;
+      }
       updateStats();
     } catch (e) {
       setDisconnected();
@@ -810,7 +857,7 @@ function toggleMode() {
     // Clear demo workers
     Object.values(workers).forEach(w => w.el.remove());
     workers = {};
-    lastEventIndex = 0;
+    lastEventTimestamp = 0;
     totalEvents = 0;
     totalTools = 0;
     startLiveMode();
@@ -822,7 +869,10 @@ function toggleMode() {
 // ═══════════════════════════════════════════════
 (async function init() {
   try {
-    const resp = await fetch('events.json?t=' + Date.now());
+    const resp = await fetch('events.json?t=' + Date.now(), {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+    });
     if (resp.ok) {
       startLiveMode();
       return;
