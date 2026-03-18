@@ -59,61 +59,44 @@
     overflow: hidden;
   }
 
-  /* ─── LIGHT OAK LAMINATE FLOOR ─── */
+  /* ─── DARK OFFICE FLOOR ─── */
   .office {
     position: relative;
     width: 100%;
     height: 100%;
     background:
-      /* Plank gaps (vertical) */
+      /* Subtle grid pattern */
       repeating-linear-gradient(
         90deg,
-        #6b4a1c 0px, #6b4a1c 1px,
-        transparent 1px, transparent 110px
+        #ffffff05 0px, #ffffff05 1px,
+        transparent 1px, transparent 60px
       ),
-      /* Plank gaps (horizontal) */
       repeating-linear-gradient(
         0deg,
-        #6b4a1c 0px, #6b4a1c 1px,
-        transparent 1px, transparent 55px
+        #ffffff05 0px, #ffffff05 1px,
+        transparent 1px, transparent 60px
       ),
-      /* Wood color variation — warm oak planks */
-      repeating-linear-gradient(
-        0deg,
-        #c8943e 0px, #d4a048 14px,
-        #ba8838 14px, #cfa045 28px,
-        #d8a84c 28px, #c49040 42px,
-        #cca044 42px, #d8ac50 56px
-      );
-    background-color: #c8943e;
+      /* Dark gradient base */
+      radial-gradient(ellipse 80% 60% at 50% 40%, #141428, #0a0a14);
+    background-color: #0d0d1a;
   }
-  /* Wood grain texture */
+  /* Subtle ambient glow */
   .office::before {
     content: '';
     position: absolute;
     inset: 0;
     background:
-      repeating-linear-gradient(
-        1deg,
-        transparent 0px, transparent 5px,
-        #0000000a 5px, #0000000a 6px
-      ),
-      repeating-linear-gradient(
-        178deg,
-        transparent 0px, transparent 9px,
-        #ffffff0a 9px, #ffffff0a 10px
-      );
+      radial-gradient(ellipse 500px 300px at 25% 30%, #f59e0b08, transparent),
+      radial-gradient(ellipse 500px 300px at 75% 65%, #3b82f608, transparent);
     pointer-events: none;
     z-index: 0;
   }
-  /* Ambient lighting from ceiling */
+  /* Vignette effect */
   .office::after {
     content: '';
     position: absolute;
     inset: 0;
-    background:
-      radial-gradient(ellipse 600px 400px at 30% 25%, #ffffff18, transparent),
-      radial-gradient(ellipse 600px 400px at 70% 60%, #ffffff12, transparent);
+    background: radial-gradient(ellipse 70% 70% at 50% 50%, transparent 40%, #00000066);
     pointer-events: none;
     z-index: 0;
   }
@@ -121,23 +104,22 @@
   /* ─── OFFICE ZONE (room) ─── */
   .zone {
     position: absolute;
-    border: 2px solid #a0803888;
+    border: 1px solid #f59e0b33;
     border-radius: 12px;
-    background: #00000018;
+    background: #ffffff06;
     z-index: 1;
-    box-shadow: inset 0 0 30px #00000010;
+    box-shadow: inset 0 0 30px #00000020;
   }
   .zone-label {
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 2px;
-    color: #3a2510;
+    color: #f59e0b;
     padding: 10px 14px;
-    border-bottom: 1px solid #a0803844;
-    background: #00000025;
+    border-bottom: 1px solid #f59e0b22;
+    background: #00000040;
     border-radius: 12px 12px 0 0;
     font-weight: 700;
-    text-shadow: 0 1px 0 #ffffff33;
   }
 
   /* ─── OFFICE FURNITURE ─── */
@@ -145,14 +127,14 @@
     position: absolute;
     width: 70px;
     height: 45px;
-    background: linear-gradient(135deg, #6b4c25, #7d5a2f);
-    border: 2px solid #8a6a35;
+    background: linear-gradient(135deg, #1a1a2e, #252540);
+    border: 2px solid #3b3b5c;
     border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 18px;
-    box-shadow: 0 3px 8px #00000055, inset 0 1px 0 #a0804044;
+    box-shadow: 0 3px 8px #00000088, inset 0 1px 0 #ffffff08;
   }
   /* Monitor on desk */
   .desk::after {
@@ -187,14 +169,14 @@
     position: absolute;
     width: 50px;
     height: 80px;
-    background: linear-gradient(180deg, #5a4020, #6b4c28);
-    border: 2px solid #7a5a30;
+    background: linear-gradient(180deg, #1a1a2e, #22223a);
+    border: 2px solid #3b3b5c;
     border-radius: 4px;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
     padding: 4px;
-    box-shadow: 0 4px 12px #00000055;
+    box-shadow: 0 4px 12px #00000088;
   }
   .bookshelf .shelf-row {
     display: flex;
@@ -224,15 +206,15 @@
   /* Whiteboard */
   .whiteboard {
     position: absolute;
-    background: linear-gradient(135deg, #e8e8e0, #d8d8d0);
-    border: 3px solid #555;
+    background: linear-gradient(135deg, #1a1a2e, #252540);
+    border: 3px solid #3b3b5c;
     border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 10px;
-    color: #666;
-    box-shadow: 0 4px 12px #00000044;
+    color: #888;
+    box-shadow: 0 4px 12px #00000088;
     padding: 4px;
   }
 
@@ -283,8 +265,8 @@
   .rug {
     position: absolute;
     border-radius: 50%;
-    background: radial-gradient(ellipse, #2a1a2a22, #1a0a1a11, transparent);
-    border: 1px solid #3a2a3a11;
+    background: radial-gradient(ellipse, #f59e0b08, #3b82f605, transparent);
+    border: 1px solid #f59e0b11;
     z-index: 0;
   }
 
@@ -688,7 +670,7 @@
       <!-- Fridge -->
       <div style="position:absolute;left:8%;bottom:8%;font-size:30px;filter:drop-shadow(0 2px 4px #00000044);">🧊</div>
       <!-- AC unit -->
-      <div style="position:absolute;right:8%;top:18%;font-size:18px;background:#ddd;padding:2px 8px;border-radius:4px;border:1px solid #aaa;box-shadow:0 2px 4px #00000033;">❄️</div>
+      <div style="position:absolute;right:8%;top:18%;font-size:18px;background:#1a1a2e;padding:2px 8px;border-radius:4px;border:1px solid #3b3b5c;box-shadow:0 2px 4px #00000066;">❄️</div>
       <!-- Rug -->
       <div class="rug" style="left:10%;top:50%;width:80%;height:30%;"></div>
       <!-- Plant -->
