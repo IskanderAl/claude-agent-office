@@ -59,50 +59,233 @@
     overflow: hidden;
   }
 
+  /* ─── LIGHT OAK LAMINATE FLOOR ─── */
   .office {
     position: relative;
     width: 100%;
     height: 100%;
     background:
-      radial-gradient(circle at 20% 30%, #1a1a2e22, transparent 50%),
-      radial-gradient(circle at 80% 70%, #f59e0b05, transparent 50%),
-      #0d0d14;
+      /* Plank gaps (vertical) */
+      repeating-linear-gradient(
+        90deg,
+        #6b4a1c 0px, #6b4a1c 1px,
+        transparent 1px, transparent 110px
+      ),
+      /* Plank gaps (horizontal) */
+      repeating-linear-gradient(
+        0deg,
+        #6b4a1c 0px, #6b4a1c 1px,
+        transparent 1px, transparent 55px
+      ),
+      /* Wood color variation — warm oak planks */
+      repeating-linear-gradient(
+        0deg,
+        #c8943e 0px, #d4a048 14px,
+        #ba8838 14px, #cfa045 28px,
+        #d8a84c 28px, #c49040 42px,
+        #cca044 42px, #d8ac50 56px
+      );
+    background-color: #c8943e;
   }
+  /* Wood grain texture */
   .office::before {
     content: '';
     position: absolute;
     inset: 0;
-    background-image:
-      linear-gradient(#ffffff06 1px, transparent 1px),
-      linear-gradient(90deg, #ffffff06 1px, transparent 1px);
-    background-size: 60px 60px;
+    background:
+      repeating-linear-gradient(
+        1deg,
+        transparent 0px, transparent 5px,
+        #0000000a 5px, #0000000a 6px
+      ),
+      repeating-linear-gradient(
+        178deg,
+        transparent 0px, transparent 9px,
+        #ffffff0a 9px, #ffffff0a 10px
+      );
     pointer-events: none;
+    z-index: 0;
+  }
+  /* Ambient lighting from ceiling */
+  .office::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 600px 400px at 30% 25%, #ffffff18, transparent),
+      radial-gradient(ellipse 600px 400px at 70% 60%, #ffffff12, transparent);
+    pointer-events: none;
+    z-index: 0;
   }
 
+  /* ─── OFFICE ZONE (room) ─── */
   .zone {
     position: absolute;
-    border: 1px solid #ffffff10;
+    border: 2px solid #a0803888;
     border-radius: 12px;
-    background: #ffffff04;
-    padding: 8px 14px;
+    background: #00000018;
+    z-index: 1;
+    box-shadow: inset 0 0 30px #00000010;
   }
   .zone-label {
-    font-size: 10px;
+    font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 2px;
-    color: #555;
+    color: #3a2510;
+    padding: 10px 14px;
+    border-bottom: 1px solid #a0803844;
+    background: #00000025;
+    border-radius: 12px 12px 0 0;
+    font-weight: 700;
+    text-shadow: 0 1px 0 #ffffff33;
   }
+
+  /* ─── OFFICE FURNITURE ─── */
   .desk {
     position: absolute;
-    width: 60px;
-    height: 40px;
-    background: linear-gradient(135deg, #1e1e30, #252540);
-    border: 1px solid #333;
+    width: 70px;
+    height: 45px;
+    background: linear-gradient(135deg, #6b4c25, #7d5a2f);
+    border: 2px solid #8a6a35;
     border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-size: 18px;
+    box-shadow: 0 3px 8px #00000055, inset 0 1px 0 #a0804044;
+  }
+  /* Monitor on desk */
+  .desk::after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 26px;
+    height: 18px;
+    background: linear-gradient(180deg, #333, #1a1a1a);
+    border: 1px solid #555;
+    border-radius: 3px;
+    box-shadow: 0 0 6px #3b82f633;
+  }
+  .desk.no-monitor::after { display: none; }
+
+  /* Chair (small circle near desk) */
+  .chair {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #555, #333);
+    border: 2px solid #666;
+    z-index: 0;
+    box-shadow: 0 2px 4px #00000044;
+  }
+
+  /* Bookshelf */
+  .bookshelf {
+    position: absolute;
+    width: 50px;
+    height: 80px;
+    background: linear-gradient(180deg, #5a4020, #6b4c28);
+    border: 2px solid #7a5a30;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 4px;
+    box-shadow: 0 4px 12px #00000055;
+  }
+  .bookshelf .shelf-row {
+    display: flex;
+    gap: 2px;
+    justify-content: center;
+  }
+  .bookshelf .book {
+    width: 6px;
+    border-radius: 1px;
+  }
+
+  /* Plant */
+  .plant {
+    position: absolute;
+    font-size: 28px;
+    filter: drop-shadow(0 2px 4px #00000066);
+    z-index: 2;
+  }
+
+  /* Coffee machine */
+  .coffee-machine {
+    position: absolute;
+    font-size: 22px;
+    filter: drop-shadow(0 2px 4px #00000066);
+  }
+
+  /* Whiteboard */
+  .whiteboard {
+    position: absolute;
+    background: linear-gradient(135deg, #e8e8e0, #d8d8d0);
+    border: 3px solid #555;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #666;
+    box-shadow: 0 4px 12px #00000044;
+    padding: 4px;
+  }
+
+  /* Server rack */
+  .server-rack {
+    position: absolute;
+    width: 40px;
+    height: 70px;
+    background: linear-gradient(180deg, #1a1a2a, #111120);
+    border: 1px solid #3b82f633;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 5px 4px;
+    box-shadow: 0 0 20px #3b82f611;
+  }
+  .server-rack .rack-led {
+    width: 100%;
+    height: 6px;
+    background: #1a1a28;
+    border-radius: 2px;
+    position: relative;
+  }
+  .server-rack .rack-led::after {
+    content: '';
+    position: absolute;
+    right: 3px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    animation: blink 2s ease-in-out infinite;
+  }
+  .server-rack .rack-led:nth-child(1)::after { background: #10b981; animation-delay: 0s; }
+  .server-rack .rack-led:nth-child(2)::after { background: #3b82f6; animation-delay: 0.3s; }
+  .server-rack .rack-led:nth-child(3)::after { background: #f59e0b; animation-delay: 0.6s; }
+  .server-rack .rack-led:nth-child(4)::after { background: #10b981; animation-delay: 0.9s; }
+  .server-rack .rack-led:nth-child(5)::after { background: #ef4444; animation-delay: 1.2s; }
+  .server-rack .rack-led:nth-child(6)::after { background: #3b82f6; animation-delay: 1.5s; }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+
+  /* Rug / carpet area */
+  .rug {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, #2a1a2a22, #1a0a1a11, transparent);
+    border: 1px solid #3a2a3a11;
+    z-index: 0;
   }
 
   /* ─── Bot ─── */
@@ -118,17 +301,33 @@
   .bot:hover .bot-details { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
 
   .bot-body {
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     background: var(--color);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
-    border: 2px solid var(--border);
+    font-size: 26px;
+    border: 3px solid var(--border);
     position: relative;
     animation: bob 2s ease-in-out infinite;
+    box-shadow: 0 4px 15px var(--glow), 0 2px 8px #00000066;
+  }
+  /* Person body below the head */
+  .bot-body::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 28px;
+    height: 14px;
+    background: var(--color);
+    border-radius: 0 0 14px 14px;
+    border: 2px solid var(--border);
+    border-top: none;
+    opacity: 0.8;
   }
   .bot-body.walking { animation: walk 0.4s ease-in-out infinite; }
 
@@ -155,39 +354,41 @@
 
   .bot-name {
     position: absolute;
-    bottom: -18px;
+    bottom: -28px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 700;
-    color: var(--color);
+    color: #ffffff !important;
     white-space: nowrap;
-    text-shadow: 0 0 8px #000;
-    background: #0a0a0fcc;
-    padding: 1px 6px;
-    border-radius: 4px;
+    text-shadow: 0 1px 3px #000;
+    background: #000000cc;
+    padding: 3px 10px;
+    border-radius: 6px;
+    border: 1px solid #555;
+    box-shadow: 0 2px 6px #00000066;
   }
 
   /* ─── Bubble ─── */
   .bubble {
     position: absolute;
-    bottom: 54px;
+    bottom: 66px;
     left: 50%;
     transform: translateX(-50%);
-    background: #1a1a2eee;
-    border: 1px solid var(--border);
+    background: #222222ee;
+    border: 2px solid var(--border);
     border-radius: 10px;
-    padding: 6px 12px;
+    padding: 6px 14px;
     font-size: 10px;
-    color: #ccc;
+    color: #fff;
     white-space: nowrap;
-    max-width: 260px;
+    max-width: 280px;
     overflow: hidden;
     text-overflow: ellipsis;
     opacity: 0;
     transition: opacity 0.3s;
     pointer-events: none;
-    box-shadow: 0 4px 20px #00000066;
+    box-shadow: 0 4px 20px #00000044;
   }
   .bubble::after {
     content: '';
@@ -206,11 +407,11 @@
   /* ─── Detail Card ─── */
   .bot-details {
     position: absolute;
-    top: 58px;
+    top: 68px;
     left: 50%;
     transform: translateX(-50%) translateY(6px);
-    background: #12121dee;
-    border: 1px solid #333;
+    background: #1a1a1aee;
+    border: 2px solid #444;
     border-radius: 10px;
     padding: 10px 14px;
     font-size: 10px;
@@ -226,12 +427,12 @@
     display: flex;
     justify-content: space-between;
     margin: 3px 0;
-    color: #888;
+    color: #aaa;
   }
   .bot-details .row .v { color: #f59e0b; font-weight: 700; }
   .bot-details .progress-bar {
     height: 3px;
-    background: #222;
+    background: #333;
     border-radius: 2px;
     margin-top: 6px;
     overflow: hidden;
@@ -248,8 +449,8 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: 100px;
-    background: linear-gradient(0deg, #0a0a0fee, #0a0a0f00);
+    height: 110px;
+    background: linear-gradient(0deg, #2a1f0fee, #2a1f0f00);
     padding: 10px 24px;
     display: flex;
     flex-direction: column-reverse;
@@ -260,13 +461,13 @@
   }
   .log-entry {
     font-size: 10px;
-    color: #555;
+    color: #6a5a3a;
     white-space: nowrap;
     animation: fadeLog 6s forwards;
   }
-  .log-entry .time { color: #333; }
+  .log-entry .time { color: #4a3f2a; }
   .log-entry .agent { color: #f59e0b; }
-  .log-entry .action { color: #666; }
+  .log-entry .action { color: #8a7a5a; }
   .log-entry.real .agent { color: #10b981; }
   .log-entry.real .action { color: #10b98199; }
 
@@ -286,9 +487,9 @@
     z-index: 50;
   }
   .btn {
-    background: #1a1a2e;
-    border: 1px solid #333;
-    color: #ccc;
+    background: #ffffffcc;
+    border: 2px solid #8a6a30;
+    color: #4a3518;
     padding: 6px 14px;
     border-radius: 6px;
     font-family: inherit;
@@ -301,13 +502,14 @@
 
   .particle {
     position: absolute;
-    width: 2px;
-    height: 2px;
+    width: 3px;
+    height: 3px;
     background: #f59e0b;
     border-radius: 50%;
     opacity: 0;
     pointer-events: none;
     animation: particle 1s ease-out forwards;
+    z-index: 15;
   }
   @keyframes particle {
     0% { opacity: 0.8; transform: translate(0, 0) scale(1); }
@@ -325,7 +527,7 @@
     stroke-width: 0.5;
     stroke-dasharray: 4 4;
     animation: dashMove 2s linear infinite;
-    opacity: 0.2;
+    opacity: 0.15;
   }
   @keyframes dashMove { to { stroke-dashoffset: -16; } }
 
@@ -343,6 +545,34 @@
   @keyframes pulse {
     0%, 100% { opacity: 1; box-shadow: 0 0 0 0 currentColor; }
     50% { opacity: 0.6; box-shadow: 0 0 8px 2px currentColor; }
+  }
+
+  /* Ceiling lights */
+  .ceiling-light {
+    position: absolute;
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, #f59e0b22, transparent);
+    border-radius: 2px;
+    z-index: 0;
+  }
+  .ceiling-light::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(ellipse, #f59e0b06, transparent);
+    pointer-events: none;
+  }
+
+  /* Water cooler */
+  .water-cooler {
+    position: absolute;
+    font-size: 20px;
+    z-index: 2;
   }
 </style>
 </head>
@@ -367,46 +597,144 @@
 
 <div class="office-wrapper">
   <div class="office" id="office">
-    <!-- Row 1 -->
-    <div class="zone" style="left:20px;top:20px;width:180px;height:170px;">
+
+    <!-- ═══ CEILING LIGHTS ═══ -->
+    <div class="ceiling-light" style="left:15%;top:8px;"></div>
+    <div class="ceiling-light" style="left:45%;top:8px;"></div>
+    <div class="ceiling-light" style="left:75%;top:8px;"></div>
+
+    <!-- ═══ ZONE 1: READ / SEARCH ═══ -->
+    <div class="zone" style="left:2%;top:3%;width:30%;height:42%;">
       <div class="zone-label">📖 Read / Search</div>
-      <div class="desk" style="left:20px;top:45px;">📖</div>
-      <div class="desk" style="left:95px;top:45px;">🔍</div>
-      <div class="desk" style="left:20px;top:105px;">📂</div>
-      <div class="desk" style="left:95px;top:105px;">🗃️</div>
+      <div class="desk" style="left:12%;top:35%;">📖</div>
+      <div class="chair" style="left:calc(12% + 24px);top:calc(35% + 50px);"></div>
+      <div class="desk" style="left:42%;top:35%;">🔍</div>
+      <div class="chair" style="left:calc(42% + 24px);top:calc(35% + 50px);"></div>
+      <div class="desk" style="left:12%;top:65%;">📂</div>
+      <div class="chair" style="left:calc(12% + 24px);top:calc(65% + 50px);"></div>
+      <div class="desk" style="left:42%;top:65%;">🗃️</div>
+      <!-- Bookshelf -->
+      <div class="bookshelf" style="right:8%;top:30%;">
+        <div class="shelf-row">
+          <div class="book" style="height:14px;background:#ef4444;"></div>
+          <div class="book" style="height:12px;background:#3b82f6;"></div>
+          <div class="book" style="height:16px;background:#10b981;"></div>
+          <div class="book" style="height:11px;background:#f59e0b;"></div>
+          <div class="book" style="height:14px;background:#8b5cf6;"></div>
+        </div>
+        <div class="shelf-row">
+          <div class="book" style="height:13px;background:#ec4899;"></div>
+          <div class="book" style="height:15px;background:#06b6d4;"></div>
+          <div class="book" style="height:11px;background:#f97316;"></div>
+          <div class="book" style="height:14px;background:#6366f1;"></div>
+        </div>
+        <div class="shelf-row">
+          <div class="book" style="height:12px;background:#84cc16;"></div>
+          <div class="book" style="height:15px;background:#e879f9;"></div>
+          <div class="book" style="height:13px;background:#14b8a6;"></div>
+          <div class="book" style="height:11px;background:#f43f5e;"></div>
+        </div>
+      </div>
     </div>
 
-    <div class="zone" style="left:220px;top:20px;width:190px;height:170px;">
+    <!-- ═══ ZONE 2: WRITE / EDIT ═══ -->
+    <div class="zone" style="left:35%;top:3%;width:30%;height:42%;">
       <div class="zone-label">✏️ Write / Edit</div>
-      <div class="desk" style="left:20px;top:45px;">✏️</div>
-      <div class="desk" style="left:100px;top:45px;">📝</div>
-      <div class="desk" style="left:60px;top:105px;">💾</div>
+      <div class="desk" style="left:12%;top:35%;">✏️</div>
+      <div class="chair" style="left:calc(12% + 24px);top:calc(35% + 50px);"></div>
+      <div class="desk" style="left:42%;top:35%;">📝</div>
+      <div class="chair" style="left:calc(42% + 24px);top:calc(35% + 50px);"></div>
+      <div class="desk" style="left:27%;top:65%;">💾</div>
+      <div class="chair" style="left:calc(27% + 24px);top:calc(65% + 50px);"></div>
+      <!-- Whiteboard -->
+      <div class="whiteboard" style="right:6%;top:35%;width:60px;height:80px;">
+        <div style="text-align:center;line-height:1.3;">
+          <span style="color:#ef4444;">TODO</span><br>
+          <span style="color:#10b981;">✓ fix</span><br>
+          <span style="color:#3b82f6;">→ test</span>
+        </div>
+      </div>
     </div>
 
-    <div class="zone" style="left:430px;top:20px;width:190px;height:170px;">
+    <!-- ═══ ZONE 3: BASH / EXECUTE ═══ -->
+    <div class="zone" style="left:68%;top:3%;width:30%;height:42%;">
       <div class="zone-label">⚡ Bash / Execute</div>
-      <div class="desk" style="left:20px;top:50px;">⚡</div>
-      <div class="desk" style="left:100px;top:50px;">🖥️</div>
-      <div class="desk" style="left:60px;top:110px;">⚙️</div>
+      <div class="desk" style="left:12%;top:35%;">⚡</div>
+      <div class="chair" style="left:calc(12% + 24px);top:calc(35% + 50px);"></div>
+      <div class="desk" style="left:42%;top:35%;">🖥️</div>
+      <div class="chair" style="left:calc(42% + 24px);top:calc(35% + 50px);"></div>
+      <div class="desk" style="left:27%;top:65%;">⚙️</div>
+      <div class="chair" style="left:calc(27% + 24px);top:calc(65% + 50px);"></div>
+      <!-- Server rack -->
+      <div class="server-rack" style="right:6%;top:30%;">
+        <div class="rack-led"></div>
+        <div class="rack-led"></div>
+        <div class="rack-led"></div>
+        <div class="rack-led"></div>
+        <div class="rack-led"></div>
+        <div class="rack-led"></div>
+      </div>
     </div>
 
-    <!-- Row 2 -->
-    <div class="zone" style="left:20px;top:220px;width:150px;height:130px;">
-      <div class="zone-label">💤 Idle / Thinking</div>
-      <div class="desk" style="left:40px;top:50px;">🧠</div>
+    <!-- ═══ ZONE 4: IDLE / LOUNGE ═══ -->
+    <div class="zone" style="left:2%;top:50%;width:20%;height:42%;">
+      <div class="zone-label">💤 Комната отдыха</div>
+      <!-- Couch left -->
+      <div style="position:absolute;left:8%;top:32%;font-size:28px;filter:drop-shadow(0 2px 4px #00000044);">🛋️</div>
+      <!-- Couch right -->
+      <div style="position:absolute;right:8%;top:32%;font-size:28px;filter:drop-shadow(0 2px 4px #00000044);transform:scaleX(-1);">🛋️</div>
+      <!-- Coffee table -->
+      <div class="desk no-monitor" style="left:35%;top:38%;width:40px;height:30px;font-size:14px;">🧠</div>
+      <!-- Fridge -->
+      <div style="position:absolute;left:8%;bottom:8%;font-size:30px;filter:drop-shadow(0 2px 4px #00000044);">🧊</div>
+      <!-- AC unit -->
+      <div style="position:absolute;right:8%;top:18%;font-size:18px;background:#ddd;padding:2px 8px;border-radius:4px;border:1px solid #aaa;box-shadow:0 2px 4px #00000033;">❄️</div>
+      <!-- Rug -->
+      <div class="rug" style="left:10%;top:50%;width:80%;height:30%;"></div>
+      <!-- Plant -->
+      <div class="plant" style="right:8%;bottom:8%;">🌿</div>
+      <!-- Coffee machine -->
+      <div class="coffee-machine" style="left:40%;bottom:8%;">☕</div>
+      <!-- Water cooler -->
+      <div style="position:absolute;right:35%;bottom:8%;font-size:22px;">🚰</div>
     </div>
 
-    <div class="zone" style="left:190px;top:220px;width:260px;height:130px;">
+    <!-- ═══ ZONE 5: WEB / RESEARCH ═══ -->
+    <div class="zone" style="left:25%;top:50%;width:36%;height:40%;">
       <div class="zone-label">🌐 Web / Research</div>
-      <div class="desk" style="left:30px;top:50px;">🌐</div>
-      <div class="desk" style="left:110px;top:50px;">🔎</div>
-      <div class="desk" style="left:180px;top:50px;">📊</div>
+      <div class="desk" style="left:10%;top:40%;">🌐</div>
+      <div class="chair" style="left:calc(10% + 24px);top:calc(40% + 50px);"></div>
+      <div class="desk" style="left:38%;top:40%;">🔎</div>
+      <div class="chair" style="left:calc(38% + 24px);top:calc(40% + 50px);"></div>
+      <div class="desk" style="left:66%;top:40%;">📊</div>
+      <div class="chair" style="left:calc(66% + 24px);top:calc(40% + 50px);"></div>
+      <!-- Globe decoration -->
+      <div class="plant" style="right:5%;bottom:10%;">🌍</div>
     </div>
 
-    <div class="zone" style="left:470px;top:220px;width:150px;height:130px;">
+    <!-- ═══ ZONE 6: SUB-AGENTS ═══ -->
+    <div class="zone" style="left:64%;top:50%;width:34%;height:40%;">
       <div class="zone-label">🤖 Sub-Agents</div>
-      <div class="desk" style="left:40px;top:50px;">🤖</div>
+      <div class="desk" style="left:15%;top:40%;">🤖</div>
+      <div class="chair" style="left:calc(15% + 24px);top:calc(40% + 50px);"></div>
+      <div class="desk" style="left:50%;top:40%;">🧬</div>
+      <div class="chair" style="left:calc(50% + 24px);top:calc(40% + 50px);"></div>
+      <!-- Server rack for agents -->
+      <div class="server-rack" style="right:6%;top:30%;">
+        <div class="rack-led"></div>
+        <div class="rack-led"></div>
+        <div class="rack-led"></div>
+        <div class="rack-led"></div>
+        <div class="rack-led"></div>
+        <div class="rack-led"></div>
+      </div>
     </div>
+
+    <!-- ═══ DECORATIONS ═══ -->
+    <div class="plant" style="left:1%;top:46%;">🪴</div>
+    <div class="plant" style="right:1%;top:46%;">🌱</div>
+    <div class="water-cooler" style="left:33%;top:47%;">🎯</div>
+    <div class="plant" style="left:63%;top:47%;">🪴</div>
 
     <svg class="connections" id="connections"></svg>
     <div class="log-panel" id="logPanel"></div>
@@ -420,21 +748,34 @@
 
 <script>
 // ═══════════════════════════════════════════════
-//  ZONE MAPPING — tool name → office zone coords
+//  ZONE MAPPING — tool name → office zone coords (percentage-based)
 // ═══════════════════════════════════════════════
-const TOOL_ZONES = {
-  'Read':      [{x: 60, y: 85}, {x: 135, y: 85}],
-  'Grep':      [{x: 135, y: 85}, {x: 60, y: 145}],
-  'Glob':      [{x: 60, y: 145}, {x: 135, y: 145}],
-  'Write':     [{x: 260, y: 85}, {x: 340, y: 85}],
-  'Edit':      [{x: 340, y: 85}, {x: 300, y: 140}],
-  'Bash':      [{x: 470, y: 90}, {x: 550, y: 90}],
-  'Agent':     [{x: 530, y: 290}],
-  'WebSearch': [{x: 240, y: 290}, {x: 320, y: 290}],
-  'WebFetch':  [{x: 320, y: 290}, {x: 390, y: 290}],
-  '_idle':     [{x: 80, y: 300}],
-  '_think':    [{x: 80, y: 300}],
-};
+
+function pct(xPct, yPct) {
+  const officeEl = document.getElementById('office');
+  return {
+    x: officeEl.clientWidth * xPct / 100,
+    y: officeEl.clientHeight * yPct / 100,
+  };
+}
+
+function getZoneCoords(toolName) {
+  const map = {
+    'Read':      [() => pct(8, 18),  () => pct(16, 18)],
+    'Grep':      [() => pct(16, 18), () => pct(8, 30)],
+    'Glob':      [() => pct(8, 30),  () => pct(16, 30)],
+    'Write':     [() => pct(42, 18), () => pct(50, 18)],
+    'Edit':      [() => pct(50, 18), () => pct(46, 28)],
+    'Bash':      [() => pct(75, 18), () => pct(83, 18)],
+    'Agent':     [() => pct(75, 65), () => pct(82, 65)],
+    'WebSearch': [() => pct(32, 65), () => pct(42, 65)],
+    'WebFetch':  [() => pct(42, 65), () => pct(50, 65)],
+    '_idle':     [() => pct(4, 56), () => pct(15, 56), () => pct(4, 66), () => pct(15, 66), () => pct(4, 76), () => pct(15, 76), () => pct(10, 61)],
+    '_think':    [() => pct(4, 56), () => pct(15, 56), () => pct(4, 66), () => pct(15, 66), () => pct(4, 76), () => pct(15, 76), () => pct(10, 61)],
+  };
+  const fns = map[toolName] || map['_idle'];
+  return fns[Math.floor(Math.random() * fns.length)]();
+}
 
 const TOOL_STYLES = {
   'Read':      { emoji: '📖', color: '#3b82f6', border: '#60a5fa', glow: '#3b82f644' },
@@ -452,8 +793,8 @@ const TOOL_STYLES = {
 // ═══════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════
-let workers = {};       // session_id -> worker object
-let mode = 'live';      // 'live' or 'demo'
+let workers = {};
+let mode = 'live';
 let lastEventTimestamp = 0;
 let totalEvents = 0;
 let totalTools = 0;
@@ -463,27 +804,27 @@ let demoIntervals = [];
 const office = document.getElementById('office');
 
 // ═══════════════════════════════════════════════
-//  KAZAKH BOT NAMES 🇰🇿
+//  KAZAKH BOT NAMES
 // ═══════════════════════════════════════════════
-// Map tool categories to dedicated Kazakh bots
 const TOOL_TO_BOT = {
-  'Read':      { name: 'Ербол',    role: 'читатель',    emoji: '📖' },
-  'Grep':      { name: 'Нұрлан',   role: 'искатель',    emoji: '🔍' },
-  'Glob':      { name: 'Нұрлан',   role: 'искатель',    emoji: '🔍' },
-  'Write':     { name: 'Бауыржан', role: 'строитель',   emoji: '🏗️' },
-  'Edit':      { name: 'Айдос',    role: 'кодер',       emoji: '⚡' },
-  'Bash':      { name: 'Дамир',    role: 'инженер',     emoji: '⚙️' },
-  'Agent':     { name: 'Искандер', role: 'мыслитель',   emoji: '🧠' },
-  'WebSearch': { name: 'Арман',    role: 'разведчик',   emoji: '🌐' },
-  'WebFetch':  { name: 'Арман',    role: 'разведчик',   emoji: '🌐' },
-  '_default':  { name: 'Тимур',    role: 'архитектор',  emoji: '📐' },
+  'Read':      { name: 'Ербол',    role: 'чтение',      emoji: '🧑‍💻' },
+  'Grep':      { name: 'Нурлан',   role: 'поиск',       emoji: '🕵️' },
+  'Glob':      { name: 'Нурлан',   role: 'поиск',       emoji: '🕵️' },
+  'Write':     { name: 'Бауыржан', role: 'код',         emoji: '👷' },
+  'Edit':      { name: 'Айдос',    role: 'код',         emoji: '👨‍💻' },
+  'Bash':      { name: 'Дамир',    role: 'консоль',     emoji: '🧑‍🔧' },
+  'Agent':     { name: 'Искандер', role: 'субагент',    emoji: '🧑‍🏫' },
+  'WebSearch': { name: 'Арман',    role: 'веб',         emoji: '🧑‍🚀' },
+  'WebFetch':  { name: 'Арман',    role: 'веб',         emoji: '🧑‍🚀' },
+  '_default':  { name: 'Тимур',    role: 'утилиты',     emoji: '🧑‍🎨' },
 };
+
 let botNameIndex = 0;
 const BOT_NAMES_EXTRA = [
-  { name: 'Қайрат',   role: 'тестировщик', emoji: '🧪' },
-  { name: 'Асет',     role: 'аналитик',    emoji: '📊' },
-  { name: 'Жандос',   role: 'дебагер',     emoji: '🐛' },
-  { name: 'Серік',    role: 'оптимизатор', emoji: '🚀' },
+  { name: 'Кайрат',   role: 'тесты',       emoji: '🧑‍🔬' },
+  { name: 'Асет',     role: 'анализ',      emoji: '👨‍💼' },
+  { name: 'Жандос',   role: 'дебаг',       emoji: '🧑‍🏭' },
+  { name: 'Серик',    role: 'скорость',    emoji: '🏃' },
 ];
 
 function getBotNameForTool(tool) {
@@ -503,8 +844,7 @@ function getOrCreateWorker(sessionId, toolName) {
   if (workers[sessionId]) return workers[sessionId];
 
   const style = TOOL_STYLES['_default'];
-  const idle = TOOL_ZONES['_idle'];
-  const pos = idle[0];
+  const pos = getZoneCoords('_idle');
 
   const el = document.createElement('div');
   el.className = 'bot';
@@ -514,14 +854,12 @@ function getOrCreateWorker(sessionId, toolName) {
   el.style.left = pos.x + 'px';
   el.style.top = pos.y + 'px';
 
-  // Sanitize: only allow alphanumeric + hyphen in shortId
   const rawId = sessionId ? sessionId.substring(0, 6) : 'main';
   const shortId = rawId.replace(/[^a-zA-Z0-9\-]/g, '');
 
-  // Safe DOM construction (no innerHTML with user data)
   el.innerHTML = `
     <div class="bubble"><span class="msg">Waiting...</span></div>
-    <div class="bot-body">🤖<div class="status-ring"></div></div>
+    <div class="bot-body">🧑‍💻<div class="status-ring"></div></div>
     <div class="bot-name"></div>
     <div class="bot-details">
       <div class="bot-title" style="font-weight:700;margin-bottom:4px;"></div>
@@ -532,14 +870,12 @@ function getOrCreateWorker(sessionId, toolName) {
       <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
     </div>
   `;
-  // Assign Kazakh bot name based on tool
-  const botInfo = getBotNameForTool(toolName) || getNextBotName();
-  const displayName = `${botInfo.name}-бот`;
-  const fullTitle = `${botInfo.emoji} ${botInfo.name}-бот ${botInfo.role}`;
 
-  // Set text safely via textContent
+  const botInfo = getBotNameForTool(toolName) || getNextBotName();
+  const displayName = `${botInfo.name} - ${botInfo.role}`;
+  const fullTitle = `${botInfo.emoji} ${botInfo.name} — ${botInfo.role}`;
+
   el.querySelector('.bot-name').textContent = displayName;
-  el.querySelector('.bot-name').style.color = style.color;
   el.querySelector('.bot-title').textContent = fullTitle;
   el.querySelector('.bot-title').style.color = style.color;
   el.querySelector('.session-text').textContent = shortId;
@@ -561,45 +897,38 @@ function getOrCreateWorker(sessionId, toolName) {
   workers[sessionId] = worker;
   updateStats();
   addLog(shortId, 'appeared in office', true);
-  spawnParticles(pos.x + 22, pos.y + 22, style.color);
+  spawnParticles(pos.x + 24, pos.y + 24, style.color);
 
   return worker;
 }
 
 function moveWorkerToTool(worker, toolName, detail) {
   const style = TOOL_STYLES[toolName] || TOOL_STYLES['_default'];
-  const zones = TOOL_ZONES[toolName] || TOOL_ZONES['_idle'];
-  const dest = zones[Math.floor(Math.random() * zones.length)];
+  const dest = getZoneCoords(toolName);
 
-  // Update visual style
   worker.el.style.setProperty('--color', style.color);
   worker.el.style.setProperty('--border', style.border);
   worker.el.style.setProperty('--glow', style.glow);
 
-  // Move
-  worker.x = dest.x + Math.random() * 20 - 10;
-  worker.y = dest.y + Math.random() * 20 - 10;
+  worker.x = dest.x + Math.random() * 30 - 15;
+  worker.y = dest.y + Math.random() * 30 - 15;
   worker.el.style.left = worker.x + 'px';
   worker.el.style.top = worker.y + 'px';
 
-  // Walking animation
   const body = worker.el.querySelector('.bot-body');
   body.textContent = '';
   body.innerHTML = style.emoji + '<div class="status-ring"></div>';
   body.classList.add('walking');
   setTimeout(() => body.classList.remove('walking'), 1500);
 
-  // Working state
   worker.el.classList.add('working');
   worker.events++;
   worker.lastTool = toolName;
   totalTools++;
 
-  // Update bubble
   const msg = worker.el.querySelector('.msg');
   msg.textContent = detail || `Using ${toolName}...`;
 
-  // Update detail card
   worker.el.querySelector('.status-text').textContent = 'working';
   worker.el.querySelector('.status-text').style.color = '#10b981';
   worker.el.querySelector('.tool-text').textContent = toolName;
@@ -607,7 +936,6 @@ function moveWorkerToTool(worker, toolName, detail) {
   worker.el.querySelector('.progress-fill').style.width = '100%';
   worker.el.querySelector('.progress-fill').style.background = style.color;
 
-  // Auto-idle after some time
   clearTimeout(worker.idleTimer);
   worker.idleTimer = setTimeout(() => {
     worker.el.classList.remove('working');
@@ -616,15 +944,14 @@ function moveWorkerToTool(worker, toolName, detail) {
     worker.el.querySelector('.status-text').style.color = '#888';
     worker.el.querySelector('.progress-fill').style.width = '0%';
 
-    // Move back to idle zone
-    const idle = TOOL_ZONES['_idle'][0];
-    worker.x = idle.x + Math.random() * 30;
-    worker.y = idle.y + Math.random() * 20;
+    const idle = getZoneCoords('_idle');
+    worker.x = idle.x;
+    worker.y = idle.y;
     worker.el.style.left = worker.x + 'px';
     worker.el.style.top = worker.y + 'px';
   }, 5000);
 
-  spawnParticles(worker.x + 22, worker.y + 22, style.color);
+  spawnParticles(worker.x + 24, worker.y + 24, style.color);
 }
 
 // ═══════════════════════════════════════════════
@@ -655,12 +982,10 @@ function startLiveMode() {
       const events = await resp.json();
       setConnected();
 
-      // Process new events (by timestamp to handle rotating buffer)
       const newEvents = events.filter(evt => evt.timestamp > lastEventTimestamp);
       for (const evt of newEvents) {
         totalEvents++;
 
-        // Each tool type gets its own dedicated bot worker
         const toolKey = evt.tool || 'unknown';
         const botInfo = getBotNameForTool(toolKey);
         const workerId = 'bot-' + botInfo.name;
@@ -668,7 +993,6 @@ function startLiveMode() {
         moveWorkerToTool(worker, evt.tool, evt.detail);
         addLog(worker.shortId, evt.detail || `${evt.tool} tool`, true);
 
-        // If it's a sub-agent launch, log it
         if (evt.tool === 'Agent' && evt.agent_name) {
           addLog('System', `🤖 ${botInfo.name} запустил: ${evt.agent_name}`, true);
         }
@@ -728,13 +1052,11 @@ function startDemo() {
 
   addLog('System', '🟡 Demo mode — simulating activity', false);
 
-  // Create some demo workers
   for (let i = 0; i < 3; i++) {
     const id = 'demo-' + (demoWorkerCount++);
     getOrCreateWorker(id);
   }
 
-  // Simulate random activity
   function randomDemoAction() {
     const ids = Object.keys(workers);
     if (ids.length === 0) return;
@@ -751,11 +1073,9 @@ function startDemo() {
     updateStats();
   }
 
-  // Stagger demo actions
   demoIntervals.push(setInterval(randomDemoAction, 2000 + Math.random() * 2000));
   demoIntervals.push(setInterval(randomDemoAction, 3000 + Math.random() * 3000));
 
-  // Occasionally spawn new demo agent
   demoIntervals.push(setInterval(() => {
     if (Object.keys(workers).length < 8 && Math.random() < 0.3) {
       const id = 'demo-' + (demoWorkerCount++);
@@ -794,14 +1114,14 @@ function addLog(agent, action, isReal) {
 }
 
 function spawnParticles(cx, cy, color) {
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 8; i++) {
     const p = document.createElement('div');
     p.className = 'particle';
     p.style.left = cx + 'px';
     p.style.top = cy + 'px';
     p.style.background = color;
     const angle = Math.random() * Math.PI * 2;
-    const dist = 15 + Math.random() * 25;
+    const dist = 20 + Math.random() * 30;
     p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
     p.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
     office.appendChild(p);
@@ -824,20 +1144,18 @@ function updateUptime() {
 }
 updateUptime();
 
-// Connection lines
 function updateConnections() {
   const svg = document.getElementById('connections');
   svg.innerHTML = '';
   const ids = Object.keys(workers);
-  // Draw lines between working workers
   const working = ids.filter(id => workers[id].el.classList.contains('working'));
   for (let i = 0; i < working.length - 1; i++) {
     const a = workers[working[i]], b = workers[working[i + 1]];
     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    line.setAttribute('x1', a.x + 22);
-    line.setAttribute('y1', a.y + 22);
-    line.setAttribute('x2', b.x + 22);
-    line.setAttribute('y2', b.y + 22);
+    line.setAttribute('x1', a.x + 24);
+    line.setAttribute('y1', a.y + 24);
+    line.setAttribute('x2', b.x + 24);
+    line.setAttribute('y2', b.y + 24);
     const style = TOOL_STYLES[a.lastTool] || TOOL_STYLES['_default'];
     line.style.stroke = style.color;
     svg.appendChild(line);
@@ -846,7 +1164,6 @@ function updateConnections() {
 }
 updateConnections();
 
-// ─── Controls ───
 function addWorker() {
   const id = 'manual-' + Date.now().toString(36);
   getOrCreateWorker(id);
@@ -856,7 +1173,6 @@ function toggleMode() {
   if (mode === 'live') {
     startDemo();
   } else {
-    // Clear demo workers
     Object.values(workers).forEach(w => w.el.remove());
     workers = {};
     lastEventTimestamp = 0;
@@ -867,7 +1183,7 @@ function toggleMode() {
 }
 
 // ═══════════════════════════════════════════════
-//  INIT — Try live first, fall back to demo
+//  INIT
 // ═══════════════════════════════════════════════
 (async function init() {
   try {
@@ -880,12 +1196,11 @@ function toggleMode() {
       return;
     }
   } catch (e) {}
-  // No events.json found — start demo
   startDemo();
 })();
 
 // ═══════════════════════════════════════════════
-//  TOKEN STATS — Poll /api/stats every 10 seconds
+//  TOKEN STATS
 // ═══════════════════════════════════════════════
 function formatTokens(n) {
   if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
@@ -899,7 +1214,6 @@ async function fetchTokenStats() {
     if (!resp.ok) return;
     const stats = await resp.json();
 
-    // Sum all models
     let totalInput = 0, totalOutput = 0, totalCache = 0;
     let currentModel = '—';
     const models = stats.modelUsage || {};
@@ -910,7 +1224,6 @@ async function fetchTokenStats() {
       totalCache += (usage.cacheReadInputTokens || 0) + (usage.cacheCreationInputTokens || 0);
     }
 
-    // Find most used model (by output tokens)
     let maxOut = 0;
     for (const [model, usage] of Object.entries(models)) {
       if ((usage.outputTokens || 0) > maxOut) {
@@ -929,9 +1242,24 @@ async function fetchTokenStats() {
   } catch (e) {}
 }
 
-// Fetch immediately and then every 10 seconds
 fetchTokenStats();
 setInterval(fetchTokenStats, 10000);
+
+// ═══════════════════════════════════════════════
+//  RESPONSIVE — recalculate on resize
+// ═══════════════════════════════════════════════
+window.addEventListener('resize', () => {
+  // Move idle workers to new positions
+  Object.values(workers).forEach(w => {
+    if (!w.el.classList.contains('working')) {
+      const pos = getZoneCoords('_idle');
+      w.x = pos.x + Math.random() * 40;
+      w.y = pos.y + Math.random() * 30;
+      w.el.style.left = w.x + 'px';
+      w.el.style.top = w.y + 'px';
+    }
+  });
+});
 
 </script>
 </body>
